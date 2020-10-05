@@ -37,19 +37,19 @@ def attempt_download(weights):
 
         try:  # GitHub
             url = 'https://github.com/ultralytics/yolov5/releases/download/v3.0/' + file
-            print('Downloading %s to %s...' % (url, weights))
+            # print('Downloading %s to %s...' % (url, weights))
             torch.hub.download_url_to_file(url, weights)
             assert os.path.exists(weights) and os.path.getsize(weights) > 1E6  # check
         except Exception as e:  # GCP
-            print('Download error: %s' % e)
+            # print('Download error: %s' % e)
             url = 'https://storage.googleapis.com/ultralytics/yolov5/ckpt/' + file
-            print('Downloading %s to %s...' % (url, weights))
+            # print('Downloading %s to %s...' % (url, weights))
             r = os.system('curl -L %s -o %s' % (url, weights))  # torch.hub.download_url_to_file(url, weights)
         finally:
             if not (os.path.exists(weights) and os.path.getsize(weights) > 1E6):  # check
                 os.remove(weights) if os.path.exists(weights) else None  # remove partial downloads
-                print('ERROR: Download failure: %s' % msg)
-            print('')
+                # print('ERROR: Download failure: %s' % msg)
+            # print('')
             return
 
 
@@ -57,7 +57,7 @@ def gdrive_download(id='1n_oKgR81BJtqk75b00eAjdv03qVCQn2f', name='coco128.zip'):
     # Downloads a file from Google Drive. from utils.google_utils import *; gdrive_download()
     t = time.time()
 
-    print('Downloading https://drive.google.com/uc?export=download&id=%s as %s... ' % (id, name), end='')
+    # print('Downloading https://drive.google.com/uc?export=download&id=%s as %s... ' % (id, name), end='')
     os.remove(name) if os.path.exists(name) else None  # remove existing
     os.remove('cookie') if os.path.exists('cookie') else None
 
@@ -74,16 +74,16 @@ def gdrive_download(id='1n_oKgR81BJtqk75b00eAjdv03qVCQn2f', name='coco128.zip'):
     # Error check
     if r != 0:
         os.remove(name) if os.path.exists(name) else None  # remove partial
-        print('Download error ')  # raise Exception('Download error')
+        # print('Download error ')  # raise Exception('Download error')
         return r
 
     # Unzip if archive
     if name.endswith('.zip'):
-        print('unzipping... ', end='')
+        # print('unzipping... ', end='')
         os.system('unzip -q %s' % name)  # unzip
         os.remove(name)  # remove zip to free space
 
-    print('Done (%.1fs)' % (time.time() - t))
+    # print('Done (%.1fs)' % (time.time() - t))
     return r
 
 

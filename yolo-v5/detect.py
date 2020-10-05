@@ -77,8 +77,6 @@ def detect(save_img=False):
 
         if pred[0] is not None:
             print("\nkruzhok")
-        else:
-            print("\nNo kruzhok")
 
         # t2 = time_synchronized()
 

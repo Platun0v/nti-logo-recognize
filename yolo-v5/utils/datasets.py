@@ -159,7 +159,7 @@ class LoadImages:  # for inference
                     ret_val, img0 = self.cap.read()
 
             self.frame += 1
-            print('video %g/%g (%g/%g) %s: ' % (self.count + 1, self.nf, self.frame, self.nframes, path), end='')
+            # print('video %g/%g (%g/%g) %s: ' % (self.count + 1, self.nf, self.frame, self.nframes, path), end='')
 
         else:
             # Read image
@@ -237,7 +237,7 @@ class LoadWebcam:  # for inference
         # Print
         assert ret_val, 'Camera Error %s' % self.pipe
         img_path = 'webcam.jpg'
-        print('webcam %g: ' % self.count, end='')
+        # print('webcam %g: ' % self.count, end='')
 
         # Padded resize
         img = letterbox(img0, new_shape=self.img_size)[0]
@@ -268,7 +268,7 @@ class LoadStreams:  # multiple IP or RTSP cameras
         self.sources = sources
         for i, s in enumerate(sources):
             # Start the thread to read frames from the video stream
-            print('%g/%g: %s... ' % (i + 1, n, s), end='')
+            # print('%g/%g: %s... ' % (i + 1, n, s), end='')
             cap = cv2.VideoCapture(eval(s) if s.isnumeric() else s)
             assert cap.isOpened(), 'Failed to open %s' % s
             w = int(cap.get(cv2.CAP_PROP_FRAME_WIDTH))
@@ -276,15 +276,16 @@ class LoadStreams:  # multiple IP or RTSP cameras
             fps = cap.get(cv2.CAP_PROP_FPS) % 100
             _, self.imgs[i] = cap.read()  # guarantee first frame
             thread = Thread(target=self.update, args=([i, cap]), daemon=True)
-            print(' success (%gx%g at %.2f FPS).' % (w, h, fps))
+            # print(' success (%gx%g at %.2f FPS).' % (w, h, fps))
             thread.start()
-        print('')  # newline
+        # print('')  # newline
 
         # check for common shapes
         s = np.stack([letterbox(x, new_shape=self.img_size)[0].shape for x in self.imgs], 0)  # inference shapes
         self.rect = np.unique(s, axis=0).shape[0] == 1  # rect inference if all shapes equal
         if not self.rect:
-            print('WARNING: Different stream shapes detected. For optimal performance supply similarly-shaped streams.')
+            pass
+            # print('WARNING: Different stream shapes detected. For optimal performance supply similarly-shaped streams.')
 
     def update(self, index, cap):
         # Read next stream frame in a daemon thread
@@ -462,7 +463,7 @@ class LoadImagesAndLabels(Dataset):  # for training/testing
                     cache_path, nf, nm, ne, nd, n)
         if nf == 0:
             s = 'WARNING: No labels found in %s. See %s' % (os.path.dirname(file) + os.sep, help_url)
-            print(s)
+            # print(s)
             assert not augment, '%s. Can not train without labels.' % s
 
         # Cache images into memory for faster training (WARNING: large datasets may exceed system RAM)
@@ -496,7 +497,7 @@ class LoadImagesAndLabels(Dataset):  # for training/testing
                 x[img] = [l, shape]
             except Exception as e:
                 x[img] = [None, None]
-                print('WARNING: %s: %s' % (img, e))
+                # print('WARNING: %s: %s' % (img, e))
 
         x['hash'] = get_hash(self.label_files + self.img_files)
         torch.save(x, path)  # save for next time
@@ -903,7 +904,8 @@ def reduce_img_size(path='path/images', img_size=1024):  # from utils.datasets i
             fnew = f.replace(path, path_new)  # .replace(Path(f).suffix, '.jpg')
             cv2.imwrite(fnew, img)
         except:
-            print('WARNING: image failure %s' % f)
+            pass
+            # print('WARNING: image failure %s' % f)
 
 
 def recursive_dataset2bmp(dataset='path/dataset_bmp'):  # from utils.datasets import *; recursive_dataset2bmp()
@@ -932,7 +934,7 @@ def imagelist2folder(path='path/images.txt'):  # from utils.datasets import *; i
     with open(path, 'r') as f:
         for line in f.read().splitlines():
             os.system('cp "%s" %s' % (line, path[:-4]))
-            print(line)
+            # print(line)
 
 
 def create_folder(path='./new'):

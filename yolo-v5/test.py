@@ -204,23 +204,25 @@ def test(data,
 
     # Print results
     pf = '%20s' + '%12.3g' * 6  # print format
-    print(pf % ('all', seen, nt.sum(), mp, mr, map50, map))
+    # print(pf % ('all', seen, nt.sum(), mp, mr, map50, map))
 
     # Print results per class
     if verbose and nc > 1 and len(stats):
         for i, c in enumerate(ap_class):
-            print(pf % (names[c], seen, nt[c], p[i], r[i], ap50[i], ap[i]))
+            pass
+            # print(pf % (names[c], seen, nt[c], p[i], r[i], ap50[i], ap[i]))
 
     # Print speeds
     t = tuple(x / seen * 1E3 for x in (t0, t1, t0 + t1)) + (imgsz, imgsz, batch_size)  # tuple
     if not training:
-        print('Speed: %.1f/%.1f/%.1f ms inference/NMS/total per %gx%g image at batch-size %g' % t)
+        pass
+        # print('Speed: %.1f/%.1f/%.1f ms inference/NMS/total per %gx%g image at batch-size %g' % t)
 
     # Save JSON
     if save_json and len(jdict):
         f = 'detections_val2017_%s_results.json' % \
             (weights.split(os.sep)[-1].replace('.pt', '') if isinstance(weights, str) else '')  # filename
-        print('\nCOCO mAP with pycocotools... saving %s...' % f)
+        #print('\nCOCO mAP with pycocotools... saving %s...' % f)
         with open(f, 'w') as file:
             json.dump(jdict, file)
 
@@ -238,7 +240,8 @@ def test(data,
             cocoEval.summarize()
             map, map50 = cocoEval.stats[:2]  # update results (mAP@0.5:0.95, mAP@0.5)
         except Exception as e:
-            print('ERROR: pycocotools unable to run: %s' % e)
+            pass
+            # print('ERROR: pycocotools unable to run: %s' % e)
 
     # Return results
     model.float()  # for training
@@ -267,7 +270,7 @@ if __name__ == '__main__':
     opt = parser.parse_args()
     opt.save_json |= opt.data.endswith('coco.yaml')
     opt.data = check_file(opt.data)  # check file
-    print(opt)
+    # print(opt)
 
     if opt.task in ['val', 'test']:  # run normally
         test(opt.data,
@@ -287,7 +290,7 @@ if __name__ == '__main__':
             x = list(range(320, 800, 64))  # x axis
             y = []  # y axis
             for i in x:  # img-size
-                print('\nRunning %s point %s...' % (f, i))
+                # print('\nRunning %s point %s...' % (f, i))
                 r, _, t = test(opt.data, weights, opt.batch_size, i, opt.conf_thres, opt.iou_thres, opt.save_json)
                 y.append(r + t)  # results and times
             np.savetxt(f, y, fmt='%10.4g')  # save

@@ -70,7 +70,8 @@ def check_git_status():
     if platform.system() in ['Linux', 'Darwin'] and not os.path.isfile('/.dockerenv'):
         s = subprocess.check_output('if [ -d .git ]; then git fetch && git status -uno; fi', shell=True).decode('utf-8')
         if 'Your branch is behind' in s:
-            print(s[s.find('Your branch is behind'):s.find('\n\n')] + '\n')
+            pass
+            # print(s[s.find('Your branch is behind'):s.find('\n\n')] + '\n')
 
 
 def check_img_size(img_size, s=32):
@@ -83,7 +84,7 @@ def check_img_size(img_size, s=32):
 
 def check_anchors(dataset, model, thr=4.0, imgsz=640):
     # Check anchor fit to data, recompute if necessary
-    print('\nAnalyzing anchors... ', end='')
+    # print('\nAnalyzing anchors... ', end='')
     m = model.module.model[-1] if hasattr(model, 'module') else model.model[-1]  # Detect()
     shapes = imgsz * dataset.shapes / dataset.shapes.max(1, keepdims=True)
     scale = np.random.uniform(0.9, 1.1, size=(shapes.shape[0], 1))  # augment scale
@@ -98,9 +99,9 @@ def check_anchors(dataset, model, thr=4.0, imgsz=640):
         return bpr, aat
 
     bpr, aat = metric(m.anchor_grid.clone().cpu().view(-1, 2))
-    print('anchors/target = %.2f, Best Possible Recall (BPR) = %.4f' % (aat, bpr), end='')
+    # print('anchors/target = %.2f, Best Possible Recall (BPR) = %.4f' % (aat, bpr), end='')
     if bpr < 0.98:  # threshold to recompute
-        print('. Attempting to generate improved anchors, please wait...' % bpr)
+        # print('. Attempting to generate improved anchors, please wait...' % bpr)
         na = m.anchor_grid.numel() // 2  # number of anchors
         new_anchors = kmean_anchors(dataset, n=na, img_size=imgsz, thr=thr, gen=1000, verbose=False)
         new_bpr = metric(new_anchors.reshape(-1, 2))[0]
@@ -109,10 +110,11 @@ def check_anchors(dataset, model, thr=4.0, imgsz=640):
             m.anchor_grid[:] = new_anchors.clone().view_as(m.anchor_grid)  # for inference
             m.anchors[:] = new_anchors.clone().view_as(m.anchors) / m.stride.to(m.anchors.device).view(-1, 1, 1)  # loss
             check_anchor_order(m)
-            print('New anchors saved to model. Update model *.yaml to use these anchors in the future.')
+            # print('New anchors saved to model. Update model *.yaml to use these anchors in the future.')
         else:
-            print('Original anchors better than new anchors. Proceeding with original anchors.')
-    print('')  # newline
+            pass
+            # print('Original anchors better than new anchors. Proceeding with original anchors.')
+    # print('')  # newline
 
 
 def check_anchor_order(m):
@@ -121,7 +123,7 @@ def check_anchor_order(m):
     da = a[-1] - a[0]  # delta a
     ds = m.stride[-1] - m.stride[0]  # delta s
     if da.sign() != ds.sign():  # same order
-        print('Reversing anchor order')
+        # print('Reversing anchor order')
         m.anchors[:] = m.anchors.flip(0)
         m.anchor_grid[:] = m.anchor_grid.flip(0)
 
@@ -143,16 +145,16 @@ def check_dataset(dict):
     if val and len(val):
         val = [os.path.abspath(x) for x in (val if isinstance(val, list) else [val])]  # val path
         if not all(os.path.exists(x) for x in val):
-            print('\nWARNING: Dataset not found, nonexistant paths: %s' % [*val])
+            # print('\nWARNING: Dataset not found, nonexistant paths: %s' % [*val])
             if s and len(s):  # download script
-                print('Downloading %s ...' % s)
+                # print('Downloading %s ...' % s)
                 if s.startswith('http') and s.endswith('.zip'):  # URL
                     f = Path(s).name  # filename
                     torch.hub.download_url_to_file(s, f)
                     r = os.system('unzip -q %s -d ../ && rm %s' % (f, f))  # unzip
                 else:  # bash script
                     r = os.system(s)
-                print('Dataset autodownload %s\n' % ('success' if r == 0 else 'failure'))  # analyze return value
+                # print('Dataset autodownload %s\n' % ('success' if r == 0 else 'failure'))  # analyze return value
             else:
                 raise Exception('Dataset not found.')
 
@@ -660,7 +662,7 @@ def non_max_suppression(prediction, conf_thres=0.1, iou_thres=0.6, merge=False, 
                 if redundant:
                     i = i[iou.sum(1) > 1]  # require redundancy
             except:  # possible CUDA error https://github.com/ultralytics/yolov3/issues/1139
-                print(x, i, x.shape, i.shape)
+                # print(x, i, x.shape, i.shape)
                 pass
 
         output[xi] = x[i]
@@ -681,7 +683,7 @@ def strip_optimizer(f='weights/best.pt', s=''):  # from utils.general import *; 
         p.requires_grad = False
     torch.save(x, s or f)
     mb = os.path.getsize(s or f) / 1E6  # filesize
-    print('Optimizer stripped from %s,%s %.1fMB' % (f, (' saved as %s,' % s) if s else '', mb))
+    # print('Optimizer stripped from %s,%s %.1fMB' % (f, (' saved as %s,' % s) if s else '', mb))
 
 
 def coco_class_count(path='../coco/labels/train2014/'):
@@ -692,7 +694,7 @@ def coco_class_count(path='../coco/labels/train2014/'):
     for i, file in enumerate(files):
         labels = np.loadtxt(file, dtype=np.float32).reshape(-1, 5)
         x += np.bincount(labels[:, 0].astype('int32'), minlength=nc)
-        print(i, len(files))
+        # print(i, len(files))
 
 
 def coco_only_people(path='../coco/labels/train2017/'):  # from utils.general import *; coco_only_people()
@@ -701,7 +703,8 @@ def coco_only_people(path='../coco/labels/train2017/'):  # from utils.general im
     for i, file in enumerate(files):
         labels = np.loadtxt(file, dtype=np.float32).reshape(-1, 5)
         if all(labels[:, 0] == 0):
-            print(labels.shape[0], file)
+            pass
+            # print(labels.shape[0], file)
 
 
 def crop_images_random(path='../images/', scale=0.50):  # from utils.general import *; crop_images_random()
@@ -781,11 +784,12 @@ def kmean_anchors(path='./data/coco128.yaml', n=9, img_size=640, thr=4.0, gen=10
         k = k[np.argsort(k.prod(1))]  # sort small to large
         x, best = metric(k, wh0)
         bpr, aat = (best > thr).float().mean(), (x > thr).float().mean() * n  # best possible recall, anch > thr
-        print('thr=%.2f: %.4f best possible recall, %.2f anchors past thr' % (thr, bpr, aat))
-        print('n=%g, img_size=%s, metric_all=%.3f/%.3f-mean/best, past_thr=%.3f-mean: ' %
-              (n, img_size, x.mean(), best.mean(), x[x > thr].mean()), end='')
+        # print('thr=%.2f: %.4f best possible recall, %.2f anchors past thr' % (thr, bpr, aat))
+        # print('n=%g, img_size=%s, metric_all=%.3f/%.3f-mean/best, past_thr=%.3f-mean: ' %
+              # (n, img_size, x.mean(), best.mean(), x[x > thr].mean()), end='')
         for i, x in enumerate(k):
-            print('%i,%i' % (round(x[0]), round(x[1])), end=',  ' if i < len(k) - 1 else '\n')  # use in *.cfg
+            pass
+            # print('%i,%i' % (round(x[0]), round(x[1])), end=',  ' if i < len(k) - 1 else '\n')  # use in *.cfg
         return k
 
     if isinstance(path, str):  # *.yaml file
@@ -803,8 +807,9 @@ def kmean_anchors(path='./data/coco128.yaml', n=9, img_size=640, thr=4.0, gen=10
     # Filter
     i = (wh0 < 3.0).any(1).sum()
     if i:
-        print('WARNING: Extremely small objects found. '
-              '%g of %g labels are < 3 pixels in width or height.' % (i, len(wh0)))
+        pass
+        # print('WARNING: Extremely small objects found. '
+        #       '%g of %g labels are < 3 pixels in width or height.' % (i, len(wh0)))
     wh = wh0[(wh0 >= 2.0).any(1)]  # filter > 2 pixels
 
     # Kmeans calculation
@@ -853,7 +858,7 @@ def print_mutation(hyp, results, yaml_file='hyp_evolved.yaml', bucket=''):
     a = '%10s' * len(hyp) % tuple(hyp.keys())  # hyperparam keys
     b = '%10.3g' * len(hyp) % tuple(hyp.values())  # hyperparam values
     c = '%10.4g' * len(results) % results  # results (P, R, mAP@0.5, mAP@0.5:0.95, val_losses x 3)
-    print('\n%s\n%s\nEvolved fitness: %s\n' % (a, b, c))
+    # print('\n%s\n%s\nEvolved fitness: %s\n' % (a, b, c))
 
     if bucket:
         url = 'gs://%s/evolve.txt' % bucket
@@ -1222,9 +1227,9 @@ def plot_evolution(yaml_file='data/hyp.finetune.yaml'):  # from utils.general im
         plt.title('%s = %.3g' % (k, mu), fontdict={'size': 9})  # limit to 40 characters
         if i % 5 != 0:
             plt.yticks([])
-        print('%15s: %.3g' % (k, mu))
+        # print('%15s: %.3g' % (k, mu))
     plt.savefig('evolve.png', dpi=200)
-    print('\nPlot saved as evolve.png')
+    # print('\nPlot saved as evolve.png')
 
 
 def plot_results_overlay(start=0, stop=0):  # from utils.general import *; plot_results_overlay()
@@ -1281,7 +1286,8 @@ def plot_results(start=0, stop=0, bucket='', id=(), labels=(),
                 # if i in [5, 6, 7]:  # share train and val loss y axes
                 #     ax[i].get_shared_y_axes().join(ax[i], ax[i - 5])
         except Exception as e:
-            print('Warning: Plotting error for %s; %s' % (f, e))
+            pass
+            # print('Warning: Plotting error for %s; %s' % (f, e))
 
     fig.tight_layout()
     ax[1].legend()

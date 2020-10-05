@@ -282,7 +282,7 @@ if __name__ == '__main__':
     opt = parser.parse_args()
     opt.save_json |= opt.data.endswith('coco.yaml')
     opt.data = check_file(opt.data)  # check file
-    print(opt)
+    # print(opt)
 
     if opt.task in ['val', 'test']:  # run normally
         test(opt.data,
@@ -302,7 +302,7 @@ if __name__ == '__main__':
             x = list(range(320, 800, 64))  # x axis
             y = []  # y axis
             for i in x:  # img-size
-                print('\nRunning %s point %s...' % (f, i))
+                # print('\nRunning %s point %s...' % (f, i))
                 r, _, t = test(opt.data, weights, opt.batch_size, i, opt.conf_thres, opt.iou_thres, opt.save_json)
                 y.append(r + t)  # results and times
             np.savetxt(f, y, fmt='%10.4g')  # save

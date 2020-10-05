@@ -71,7 +71,7 @@ class Model(nn.Module):
 
         # Define model
         if nc and nc != self.yaml['nc']:
-            print('Overriding model.yaml nc=%g with nc=%g' % (self.yaml['nc'], nc))
+            # print('Overriding model.yaml nc=%g with nc=%g' % (self.yaml['nc'], nc))
             self.yaml['nc'] = nc  # override yaml value
         self.model, self.save = parse_model(deepcopy(self.yaml), ch=[ch])  # model, savelist, ch_out
         # print([x.shape for x in self.forward(torch.zeros(1, ch, 64, 64))])
@@ -90,7 +90,7 @@ class Model(nn.Module):
         # Init weights, biases
         initialize_weights(self)
         self.info()
-        print('')
+        # print('')
 
     def forward(self, x, augment=False, profile=False):
         if augment:
@@ -128,13 +128,14 @@ class Model(nn.Module):
                 for _ in range(10):
                     _ = m(x)
                 dt.append((time_synchronized() - t) * 100)
-                print('%10.1f%10.0f%10.1fms %-40s' % (o, m.np, dt[-1], m.type))
+                # print('%10.1f%10.0f%10.1fms %-40s' % (o, m.np, dt[-1], m.type))
 
             x = m(x)  # run
             y.append(x if m.i in self.save else None)  # save output
 
         if profile:
-            print('%.1fms total' % sum(dt))
+            pass
+            # print('%.1fms total' % sum(dt))
         return x
 
     def _initialize_biases(self, cf=None):  # initialize biases into Detect(), cf is class frequency
@@ -150,7 +151,7 @@ class Model(nn.Module):
         m = self.model[-1]  # Detect() module
         for mi in m.m:  # from
             b = mi.bias.detach().view(m.na, -1).T  # conv.bias(255) to (3,85)
-            print(('%6g Conv2d.bias:' + '%10.3g' * 6) % (mi.weight.shape[1], *b[:5].mean(1).tolist(), b[5:].mean()))
+            # print(('%6g Conv2d.bias:' + '%10.3g' * 6) % (mi.weight.shape[1], *b[:5].mean(1).tolist(), b[5:].mean()))
 
     # def _print_weights(self):
     #     for m in self.model.modules():
@@ -158,7 +159,7 @@ class Model(nn.Module):
     #             print('%10.3g' % (m.w.detach().sigmoid() * 2))  # shortcut weights
 
     def fuse(self):  # fuse model Conv2d() + BatchNorm2d() layers
-        print('Fusing layers... ')
+        # print('Fusing layers... ')
         for m in self.model.modules():
             if type(m) is Conv and hasattr(Conv, 'bn'):
                 m._non_persistent_buffers_set = set()  # pytorch 1.6.0 compatability
@@ -170,7 +171,7 @@ class Model(nn.Module):
 
     def add_nms(self):  # fuse model Conv2d() + BatchNorm2d() layers
         if type(self.model[-1]) is not NMS:  # if missing NMS
-            print('Adding NMS module... ')
+            # print('Adding NMS module... ')
             m = NMS()  # module
             m.f = -1  # from
             m.i = self.model[-1].i + 1  # index

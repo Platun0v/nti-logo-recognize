@@ -21,7 +21,7 @@ if __name__ == '__main__':
     parser.add_argument('--batch-size', type=int, default=1, help='batch size')
     opt = parser.parse_args()
     opt.img_size *= 2 if len(opt.img_size) == 1 else 1  # expand
-    print(opt)
+    # print(opt)
     set_logging()
 
     # Input
@@ -42,19 +42,20 @@ if __name__ == '__main__':
 
     # TorchScript export
     try:
-        print('\nStarting TorchScript export with torch %s...' % torch.__version__)
+        # ('\nStarting TorchScript export with torch %s...' % torch.__version__)
         f = opt.weights.replace('.pt', '.torchscript.pt')  # filename
         ts = torch.jit.trace(model, img)
         ts.save(f)
-        print('TorchScript export success, saved as %s' % f)
+        # print('TorchScript export success, saved as %s' % f)
     except Exception as e:
-        print('TorchScript export failure: %s' % e)
+        pass
+        # print('TorchScript export failure: %s' % e)
 
     # ONNX export
     try:
         import onnx
 
-        print('\nStarting ONNX export with onnx %s...' % onnx.__version__)
+        # print('\nStarting ONNX export with onnx %s...' % onnx.__version__)
         f = opt.weights.replace('.pt', '.onnx')  # filename
         torch.onnx.export(model, img, f, verbose=False, opset_version=12, input_names=['images'],
                           output_names=['classes', 'boxes'] if y is None else ['output'])
@@ -63,22 +64,24 @@ if __name__ == '__main__':
         onnx_model = onnx.load(f)  # load onnx model
         onnx.checker.check_model(onnx_model)  # check onnx model
         # print(onnx.helper.printable_graph(onnx_model.graph))  # print a human readable model
-        print('ONNX export success, saved as %s' % f)
+        # print('ONNX export success, saved as %s' % f)
     except Exception as e:
-        print('ONNX export failure: %s' % e)
+        pass
+        # print('ONNX export failure: %s' % e)
 
     # CoreML export
     try:
         import coremltools as ct
 
-        print('\nStarting CoreML export with coremltools %s...' % ct.__version__)
+        # print('\nStarting CoreML export with coremltools %s...' % ct.__version__)
         # convert model from torchscript and apply pixel scaling as per detect.py
         model = ct.convert(ts, inputs=[ct.ImageType(name='images', shape=img.shape, scale=1 / 255.0, bias=[0, 0, 0])])
         f = opt.weights.replace('.pt', '.mlmodel')  # filename
         model.save(f)
-        print('CoreML export success, saved as %s' % f)
+        # print('CoreML export success, saved as %s' % f)
     except Exception as e:
-        print('CoreML export failure: %s' % e)
+        pass
+        # print('CoreML export failure: %s' % e)
 
     # Finish
-    print('\nExport complete. Visualize with https://github.com/lutzroeder/netron.')
+    # print('\nExport complete. Visualize with https://github.com/lutzroeder/netron.')

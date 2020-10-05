@@ -84,7 +84,7 @@ def train(hyp, opt, device, tb_writer=None):
     if any(freeze):
         for k, v in model.named_parameters():
             if any(x in k for x in freeze):
-                print('freezing %s' % k)
+                # print('freezing %s' % k)
                 v.requires_grad = False
 
     # Optimizer
@@ -534,5 +534,5 @@ if __name__ == '__main__':
 
         # Plot results
         plot_evolution(yaml_file)
-        print('Hyperparameter evolution complete. Best results saved as: %s\nCommand to train a new model with these '
-              'hyperparameters: $ python train.py --hyp %s' % (yaml_file, yaml_file))
+        #print('Hyperparameter evolution complete. Best results saved as: %s\nCommand to train a new model with these '
+              #'hyperparameters: $ python train.py --hyp %s' % (yaml_file, yaml_file))
