@@ -76,7 +76,9 @@ def detect(save_img=False):
         pred = non_max_suppression(pred, opt.conf_thres, opt.iou_thres, classes=opt.classes, agnostic=opt.agnostic_nms)
 
         if pred[0] is not None:
-            print("kruzhok")
+            print("\nkruzhok")
+        else:
+            print("\nNo kruzhok")
 
         # t2 = time_synchronized()
 
@@ -170,7 +172,7 @@ if __name__ == '__main__':
     parser.add_argument('--augment', action='store_true', help='augmented inference')
     parser.add_argument('--update', action='store_true', help='update all models')
     opt = parser.parse_args()
-    print(opt)
+    # print(opt)
 
     with torch.no_grad():
             detect()
