@@ -43,10 +43,11 @@ def select_device(device='', batch_size=None):
         for i in range(0, ng):
             if i == 1:
                 s = ' ' * len(s)
-            logger.info("%sdevice%g _CudaDeviceProperties(name='%s', total_memory=%dMB)" %
-                        (s, i, x[i].name, x[i].total_memory / c))
+            # logger.info("%sdevice%g _CudaDeviceProperties(name='%s', total_memory=%dMB)" %
+            #             (s, i, x[i].name, x[i].total_memory / c))
     else:
-        logger.info('Using CPU')
+        pass
+        # logger.info('Using CPU')
 
     logger.info('')  # skip a line
     return torch.device('cuda:0' if cuda else 'cpu')
